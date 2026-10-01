@@ -9,8 +9,19 @@ import Foundation
 import LocalAuthentication
 
 actor AuthenticationService {
+    private let context = LAContext()
+    
+    var biometricImageName: String {
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+        
+        switch context.biometryType {
+            case .faceID: return "faceid"
+            case .touchID: return "touchid"
+            default: return "lock.fill"
+        }
+    }
+    
     func authenticate() async throws -> Bool {
-        let context = LAContext()
         var error: NSError?
         
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
